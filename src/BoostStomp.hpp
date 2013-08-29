@@ -166,7 +166,7 @@ namespace STOMP {
             bool subscribe 	( std::string& topic, pfnOnStompMessage_t callback );
             bool unsubscribe ( std::string& topic );
             bool acknowledge ( Frame* _frame, bool acked );
-
+			
             // STOMP transactions
             int  begin(); // returns a new transaction id
             bool commit(int transaction_id);

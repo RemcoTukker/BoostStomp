@@ -81,9 +81,9 @@ namespace STOMP {
 	  }
 	}
 	// special header: content-length
-	if( m_body.v.size() > 0 ) {
-	  os << "content-length:" << m_body.v.size() << "\n";
-	}
+	//if( m_body.v.size() > 0 ) {   //we should do this ourselves, as it has special meaning for hornetq (not always desired)
+	//  os << "content-length:" << m_body.v.size() << "\n";
+	//}
 	// write newline signifying end of headers
 	os << "\n";
 	// step 3. Write the body

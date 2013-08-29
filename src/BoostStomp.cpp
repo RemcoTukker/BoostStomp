@@ -44,6 +44,7 @@ namespace STOMP {
 
   // used by debug_print
   boost::mutex global_stream_lock;
+  boost::mutex subscription_id_lock;
   
   // ----------------------------
   // constructor
@@ -193,6 +194,7 @@ namespace STOMP {
           start_stomp_read_headers();
           // start worker thread (m_io_service.run())
           worker_thread = new boost::thread( boost::bind( &BoostStomp::worker, this, m_io_service ) );
+		  sleep(1); //wait a bit for CONNECTED frame
       } else {
           // We need to close the socket used in the previous connection attempt
           // before starting a new one.
@@ -438,7 +440,7 @@ namespace STOMP {
 	  if (_headers.find("destination") != _headers.end()) {
 		  string& dest = _headers["destination"];
 		  //
-		  if (pfnOnStompMessage_t callback_function = m_subscriptions[dest]) {
+		  if (pfnOnStompMessage_t callback_function = m_subscriptions[dest] ) {
 			  //debug_print(boost::format("-- consume_frame: firing callback for %1%") % dest);
 			  //
 			  acked = callback_function(m_rcvd_frame);
@@ -503,6 +505,7 @@ namespace STOMP {
   // ------------------------------------------
   {
 	  //debug_print(boost::format("Setting callback function for %1%") % topic);
+	  
 	  m_subscriptions[topic] = callback;
 	  return(do_subscribe(topic));
   }
@@ -512,7 +515,7 @@ namespace STOMP {
   // ------------------------------------------
   {
 	  hdrmap hm;
-	  hm["id"] = lexical_cast<string>(boost::this_thread::get_id());
+	  hm["id"] = topic + lexical_cast<string>(boost::this_thread::get_id()); //topic; lexical_cast<string>(m_subscription_id++); ....
 	  hm["destination"] = topic;
 	  return(send_frame(new Frame( "SUBSCRIBE", hm )));
   }
